@@ -1,6 +1,7 @@
 import random
 import sys
 import time
+from tkinter import messagebox
 
 import pygame as pg
 
@@ -153,14 +154,17 @@ def main():
     bird = Bird(3, (900, 400))
     bombs = [Bomb() for _ in range(NUM_OF_BOMBS)]
     beam = None
+    beams = []
 
     tmr = 0
+    count = 0
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 beam = Beam(bird)
+                beams.append(beam)
 
         tmr += 1
         screen.blit(bg_img, [0, 0])
@@ -172,6 +176,7 @@ def main():
                 bird.change_img(8, screen)
                 pg.display.update()
                 time.sleep(1)
+                messagebox.showinfo('結果',str(count)+'個落とした')
                 return
             
         key_lst = pg.key.get_pressed()
@@ -184,6 +189,7 @@ def main():
                     beam = None
                     del bombs[i]
                     bird.change_img(6, screen)
+                    count+=1
                     break
 
         pg.display.update()
