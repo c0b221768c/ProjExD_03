@@ -1,11 +1,10 @@
 import random
 import sys
 import time
+import pygame as pg
 from tkinter import messagebox
 
-import pygame as pg
-
-
+# 定数の設定
 WIDTH = 1600  # ゲームウィンドウの幅
 HEIGHT = 900  # ゲームウィンドウの高さ
 NUM_OF_BOMBS = 5 # Bombの数
@@ -99,12 +98,13 @@ class Bomb:
         """
         爆弾円surfaceを生成する
         """
-        rad = random.randint(10, 50)
-        color = random.choice(Bomb._colors)
+        rad = random.randint(10, 50) # ランダムで10~50
+        color = random.choice(Bomb._colors) # ランダムで色を選択
         self._img = pg.Surface((2*rad, 2*rad))
         pg.draw.circle(self._img, color, (rad, rad), rad)
         self._img.set_colorkey((0, 0, 0))
         self._rct = self._img.get_rect()
+        # ランダムで始まる場所
         self._rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)
         self._vx, self._vy = random.choice(Bomb._dires), random.choice(Bomb._dires)
 
