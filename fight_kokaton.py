@@ -108,6 +108,29 @@ class Bomb:
         screen.blit(self._img, self._rct)
 
 
+class Beam:
+    """
+    ビームに関するクラス
+    """
+    def __init__(self, bird: Bird):
+        """
+        割愛
+        """
+        self._img = pg.transform.rotozoom(pg.image.load(f"ex03/fig/beam.png"), 0, 2.0)  # 画像surface
+        self._rct = self._img.get_rect()  # 画像surfaceに対応したrect
+        self._rct.left = bird._rct.right  # こうかとんの右側にビームの左側を合わせる
+        self._rct.centery = bird._rct.centery
+        self._vx, self._vy = +1, 0
+
+    def update(self, screen: pg.Surface):
+        """
+        ビームを速度self._vyに基づき移動させる
+        引数 screen：画面Surface
+        """
+        self._rct.move_ip(self._vx, self._vy)
+        screen.blit(self._img, self._rct)
+
+
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -116,25 +139,37 @@ def main():
 
     bird = Bird(3, (900, 400))
     bomb = Bomb((255, 0, 0), 10)
+    beam = None
 
     tmr = 0
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return
+            if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                beam = Beam(bird)
+
         tmr += 1
         screen.blit(bg_img, [0, 0])
         
-        if bird._rct.colliderect(bomb._rct):
-            # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
-            bird.change_img(8, screen)
-            pg.display.update()
-            time.sleep(1)
-            return
-
+        if bomb is not None:  # 爆弾が存在しているとき
+            bomb.update(screen)
+            if bird._rct.colliderect(bomb._rct):
+                # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
+                bird.change_img(8, screen)
+                pg.display.update()
+                time.sleep(1)
+                return
+            
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
-        bomb.update(screen)
+
+        if beam is not None:  # ビームが存在しているとき
+            beam.update(screen)
+            if bomb is not None and beam._rct.colliderect(bomb._rct):
+                beam = None
+                bomb = None
+
         pg.display.update()
         clock.tick(1000)
 
